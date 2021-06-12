@@ -1,7 +1,7 @@
 # FRAUDRE
 **Overview** 
 
-This repository is PyTorch implementation of the method proposed in "GraphMNIST: A Graph Imbalance and Inconsistency Resistant Graph Fraud Detector".
+This repository is PyTorch implementation of the method proposed in "FRAUDRE: Fraud Detection Dual-Resistant toGraph Inconsistency and Imbalance".
 
 **Requirements**  
 
