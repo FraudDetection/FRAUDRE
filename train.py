@@ -1,20 +1,7 @@
 import time
-import os
-import random
 import argparse
 from sklearn.model_selection import train_test_split
-import torch
-import torch.nn as nn
-from torch.nn import init
-import torch.nn.functional as F
-from torch.autograd import Variable
 
-import numpy as np
-import scipy.sparse as sp
-from scipy.io import loadmat
-from sklearn.metrics import f1_score, accuracy_score, recall_score, roc_auc_score, average_precision_score, precision_score
-from collections import defaultdict
-import math
 from model import MODEL
 from layers import *
 from utlis import *
@@ -183,4 +170,3 @@ for epoch in range(args.num_epochs):
 
 print("The training time per epoch")
 print(overall_time/args.num_epochs)
-
