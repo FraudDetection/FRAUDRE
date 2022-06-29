@@ -1,24 +1,11 @@
-import time
-import os
-import random
-import argparse
-from sklearn.model_selection import train_test_split
 import torch
 import torch.nn as nn
 from torch.nn import init
-import torch.nn.functional as F
-from torch.autograd import Variable
-
-import numpy as np
-import scipy.sparse as sp
-from scipy.io import loadmat
-from sklearn.metrics import f1_score, accuracy_score, recall_score, roc_auc_score, average_precision_score, precision_score
-from collections import defaultdict
 import math
 
 class MODEL(nn.Module):
 
-	def __init__(self, K, num_classes, embed_dim, agg, lambda_1, prior, cuda ):
+	def __init__(self, K, num_classes, embed_dim, agg, prior, cuda ):
 		super(MODEL, self).__init__()
 
 		"""
@@ -33,7 +20,8 @@ class MODEL(nn.Module):
 
 		self.agg = agg
 		self.cuda = cuda
-		self.lambda_1 = lambda_1
+		#self.lambda_1 = lambda_1
+
 		self.K = K #how many layers
 		self.prior = prior
 		self.xent = nn.CrossEntropyLoss()
@@ -88,6 +76,6 @@ class MODEL(nn.Module):
 		scores_mlp = scores_mlp + torch.log(logits)
 
 		loss_model = self.xent(scores_model, labels.squeeze())
-		loss_mlp = self.xent(scores_mlp, labels.squeeze())
-		final_loss = loss_model + self.lambda_1 * loss_mlp
+		#loss_mlp = self.xent(scores_mlp, labels.squeeze())
+		final_loss = loss_model #+ self.lambda_1 * loss_mlp
 		return final_loss
