@@ -44,6 +44,7 @@ homo, relation1, relation2, relation3, feat_data, labels = load_data(args.data)
 np.random.seed(args.seed)
 random.seed(args.seed)
 torch.manual_seed(args.seed)
+torch.cuda.manual_seed_all(args.seed)
 
 
 # train_test split
