@@ -39,7 +39,7 @@ def load_data(data):
 
 	if data == 'yelp':
 
-		yelp = loadmat('YelpChi.mat')
+		yelp = loadmat('data/YelpChi.mat')
 		homo = sparse_to_adjlist(yelp['homo'])
 		relation1 = sparse_to_adjlist(yelp['net_rur'])
 		relation2 = sparse_to_adjlist(yelp['net_rtr'])
@@ -49,31 +49,13 @@ def load_data(data):
 
 	elif data == 'amazon':
 
-		amz = loadmat('Amazon.mat')
+		amz = loadmat('data/Amazon.mat')
 		homo = sparse_to_adjlist(amz['homo'])
 		relation1 = sparse_to_adjlist(amz['net_upu'])
 		relation2 = sparse_to_adjlist(amz['net_usu'])
 		relation3 = sparse_to_adjlist(amz['net_uvu'])
 		feat_data = amz['features'].toarray()
 		labels = amz['label'].flatten()
-
-	elif data =="Amazon_demo":
-		amz = loadmat('data/Amazon_demo.mat')
-		homo = sparse_to_adjlist(amz['homo'])
-		relation1 = sparse_to_adjlist(amz['net_upu'])
-		relation2 = sparse_to_adjlist(amz['net_usu'])
-		relation3 = sparse_to_adjlist(amz['net_uvu'])
-		feat_data = amz['features'].toarray()
-		labels = amz['label'].flatten()
-
-	elif data == "Yelp_demo":
-		yelp = loadmat('data/Yelp_demo.mat')
-		homo = sparse_to_adjlist(yelp['homo'])
-		relation1 = sparse_to_adjlist(yelp['net_rur'])
-		relation2 = sparse_to_adjlist(yelp['net_rtr'])
-		relation3 = sparse_to_adjlist(yelp['net_rsr'])
-		feat_data = yelp['features'].toarray()
-		labels = yelp['label'].flatten()
 
 
 	return homo, relation1, relation2, relation3, feat_data, labels
@@ -112,6 +94,6 @@ def test_model(test_cases, labels, model):
 	print(f"GNN precision: {precision_gnn:.4f}")
 	print(f"GNN a_precision: {a_p:.4f}")
 	print(f"GNN Recall: {recall_gnn:.4f}")
-	#print(f"GNN f1: {f1:.4f}")
+	print(f"GNN f1: {f1:.4f}")
 
 	return auc_gnn, precision_gnn, a_p, recall_gnn, f1
