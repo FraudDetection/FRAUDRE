@@ -29,11 +29,10 @@ from utlis import *
 parser = argparse.ArgumentParser()
 
 # dataset and model dependent args
-parser.add_argument('--data', type=str, default='Amazon_demo', help='The dataset name. [Amazon_demo, Yelp_demo, amazon,yelp]')
+parser.add_argument('--data', type=str, default='amazon', help='The dataset name. [Amazon_demo, Yelp_demo, amazon,yelp]')
 parser.add_argument('--batch-size', type=int, default=100, help='Batch size 1024 for yelp, 256 for amazon.')
 parser.add_argument('--lr', type=float, default=0.1, help='Initial learning rate. [0.1 for amazon and 0.001 for yelp]')
-parser.add_argument('--lambda_1', type=float, default=0, help='lambad_1 = 0, ignore it')
-parser.add_argument('--lambda_2', type=float, default=1e-4, help='Weight decay (L2 loss weight).')
+parser.add_argument('--lambda_1', type=float, default=1e-4, help='Weight decay (L2 loss weight).')
 parser.add_argument('--embed_dim', type=int, default=64, help='Node embedding size at the first layer.')
 parser.add_argument('--num_epochs', type=int, default=71, help='Number of epochs.')
 parser.add_argument('--test_epochs', type=int, default=10, help='Epoch interval to run test set.')
@@ -74,34 +73,19 @@ if args.data == 'yelp':
 	p1 = 1- p0
 	prior = np.array([p1, p0])
 
-	# prior = np.array([0.85, 0.15])
-
 elif args.data == 'amazon':
 
 	# 0-3304 are unlabeled nodes
 	index = list(range(3305, len(labels)))
 	idx_train, idx_test, y_train, y_test = train_test_split(index, labels[3305:], stratify = labels[3305:],
 															test_size = 0.90, random_state = 2, shuffle = True)
-	prior = np.array([0.9, 0.1])
 
-elif args.data == 'Amazon_demo':
-	
-	index = list(range(len(labels)))
-	idx_train, idx_test, y_train, y_test = train_test_split(index, labels, stratify=labels,
-															test_size = 0.60, random_state = 2, shuffle = True)
-	prior = np.array([0.9, 0.1])
-
-elif args.data == 'Yelp_demo':
-
-	index = list(range(len(labels)))
-	idx_train, idx_test, y_train, y_test = train_test_split(index, labels, stratify = labels, test_size = 0.80,
-															random_state = 2, shuffle = True)
-
-	num_1 = len(np.where(y_train==1)[0])
-	num_2 = len(np.where(y_train==0)[0])
-	p0 = (num_1/(num_1+num_2))
-	p1 = 1- p0
+	num_1 = len(np.where(y_train == 1)[0])
+	num_2 = len(np.where(y_train == 0)[0])
+	p0 = (num_1 / (num_1 + num_2))
+	p1 = 1 - p0
 	prior = np.array([p1, p0])
+	#prior = np.array([0.9, 0.1])
 
 
 # initialize model input
@@ -134,16 +118,15 @@ intra2_3 = IntraAgg(cuda = args.cuda)
 
 #def __init__(self, features, embed_dim, adj_lists, intraggs, cuda = False):
 agg2 = InterAgg(lambda nodes: agg1(nodes), args.embed_dim*2, adj_lists, [intra2_1, intra2_2, intra2_3], cuda = args.cuda)
-gnn_model = MODEL(2, 2, args.embed_dim, agg2, args.lambda_1, prior, cuda = args.cuda)
-
+gnn_model = MODEL(2, 2, args.embed_dim, agg2, prior, cuda = args.cuda)
 # gnn_model in one convolution layer
-#gnn_model = MODEL(1, 2, args.embed_dim, agg1, args.lambda_1, prior, cuda = args.cuda)
+#gnn_model = MODEL(1, 2, args.embed_dim, agg1, prior, cuda = args.cuda)
 
 
 if args.cuda:
 	gnn_model.cuda()
 
-optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, gnn_model.parameters()), lr=args.lr, weight_decay=args.lambda_2)
+optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, gnn_model.parameters()), lr=args.lr, weight_decay=args.lambda_1)
 performance_log = []
 
 # train the model
@@ -200,3 +183,4 @@ for epoch in range(args.num_epochs):
 
 print("The training time per epoch")
 print(overall_time/args.num_epochs)
+
