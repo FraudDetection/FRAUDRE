@@ -207,7 +207,8 @@ class IntraAgg(nn.Module):
 
 
 		num_neigh = mask.sum(1,keepdim=True)
-		mask = torch.true_divide(mask, num_neigh)
+		#mask = torch.true_divide(mask, num_neigh)
+		mask = torch.div(mask, num_neigh)
 
 		neighbors_new_index = [unique_nodes_new_index[n] for n in unique_nodes_list ]
 
