@@ -5,7 +5,7 @@ import math
 
 class MODEL(nn.Module):
 
-	def __init__(self, K, num_classes, embed_dim, agg, prior, cuda ):
+	def __init__(self, K, num_classes, embed_dim, agg, prior):
 		super(MODEL, self).__init__()
 
 		"""
@@ -19,7 +19,6 @@ class MODEL(nn.Module):
 		"""
 
 		self.agg = agg
-		self.cuda = cuda
 		#self.lambda_1 = lambda_1
 
 		self.K = K #how many layers
@@ -65,17 +64,13 @@ class MODEL(nn.Module):
 
 		#the classification module
 
-		if self.cuda:
-			logits = (torch.from_numpy(self.prior +1e-8)).cuda()
-		else:
-			logits = (torch.from_numpy(self.prior +1e-8))
-
 		scores_model, scores_mlp = self.forward(nodes, train_flag)
 
-		scores_model = scores_model + torch.log(logits)
-		scores_mlp = scores_mlp + torch.log(logits)
+		scores_model = scores_model + torch.log(self.prior)
+		scores_mlp = scores_mlp + torch.log(self.prior)
 
 		loss_model = self.xent(scores_model, labels.squeeze())
 		#loss_mlp = self.xent(scores_mlp, labels.squeeze())
 		final_loss = loss_model #+ self.lambda_1 * loss_mlp
 		return final_loss
+
