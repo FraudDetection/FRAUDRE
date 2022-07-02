@@ -21,7 +21,7 @@ parser.add_argument('--batch-size', type=int, default=100, help='Batch size 1024
 parser.add_argument('--lr', type=float, default=0.1, help='Initial learning rate. [0.1 for amazon and 0.001 for yelp]')
 parser.add_argument('--lambda_1', type=float, default=1e-4, help='Weight decay (L2 loss weight).')
 parser.add_argument('--embed_dim', type=int, default=64, help='Node embedding size at the first layer.')
-parser.add_argument('--num_epochs', type=int, default=71, help='Number of epochs.')
+parser.add_argument('--num_epochs', type=int, default=61, help='Number of epochs.')
 parser.add_argument('--test_epochs', type=int, default=10, help='Epoch interval to run test set.')
 parser.add_argument('--seed', type=int, default=123, help='Random seed.')
 parser.add_argument('--no_cuda', action='store_true', default=False, help='Disables CUDA training.')
@@ -61,6 +61,11 @@ if args.data == 'yelp':
 	p1 = 1- p0
 	prior = np.array([p1, p0])
 
+	if args.cuda:
+		prior = (torch.from_numpy(prior +1e-8)).cuda()
+	else:
+		prior = (torch.from_numpy(prior +1e-8))
+
 elif args.data == 'amazon':
 
 	# 0-3304 are unlabeled nodes
@@ -73,6 +78,10 @@ elif args.data == 'amazon':
 	p0 = (num_1 / (num_1 + num_2))
 	p1 = 1 - p0
 	prior = np.array([p1, p0])
+	if args.cuda:
+		prior = (torch.from_numpy(prior +1e-8)).cuda()
+	else:
+		prior = (torch.from_numpy(prior +1e-8))
 	#prior = np.array([0.9, 0.1])
 
 
@@ -106,7 +115,7 @@ intra2_3 = IntraAgg(cuda = args.cuda)
 
 #def __init__(self, features, embed_dim, adj_lists, intraggs, cuda = False):
 agg2 = InterAgg(lambda nodes: agg1(nodes), args.embed_dim*2, adj_lists, [intra2_1, intra2_2, intra2_3], cuda = args.cuda)
-gnn_model = MODEL(2, 2, args.embed_dim, agg2, prior, cuda = args.cuda)
+gnn_model = MODEL(2, 2, args.embed_dim, agg2, prior)
 # gnn_model in one convolution layer
 #gnn_model = MODEL(1, 2, args.embed_dim, agg1, prior, cuda = args.cuda)
 
@@ -171,3 +180,4 @@ for epoch in range(args.num_epochs):
 
 print("The training time per epoch")
 print(overall_time/args.num_epochs)
+
